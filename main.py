@@ -35,7 +35,6 @@ async def start():
     dp.shutdown.register(stop_bot)
 
     update_data()
-    print(settings)
 
     try:
         await dp.start_polling(bot)

@@ -1,6 +1,5 @@
 from googleapiclient.discovery import build
-
-# will read this information from google sheets
+from core.settings import settings
 
 admin_list_id = []
 
@@ -23,5 +22,39 @@ def write_to_table(write_sheet, spreadsheetId: str, range: str, values: list):
     ).execute()
 
 
+def get_admin_list():
+    global admin_list_id
+    users_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id,
+                                  f'{USERS_SHEET_NAME}!A1:H1000')
+
+    role_index = users_sheet[0].index('role')
+    nick_index = users_sheet[0].index('nick')
+
+    admin_list_id = []
+    for line in users_sheet[1:]:
+        if len(line) > role_index and line[role_index] == 'admin':
+            admin_list_id.append(line[nick_index])
+
+
 def update_data():
-    pass
+    global admin_list_id
+    global KIDS_SHEET_NAME, USERS_SHEET_NAME, KID_USERS_SHEET_NAME, TEACHER_SHEET_NAME, REVIEWS_SHEET_NAME
+
+    settings_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id, 'settings!A1:H1000')
+    settings_dict = {i[0]: i[1] for i in settings_sheet}
+
+    print(settings_dict)
+
+    KIDS_SHEET_NAME = settings_dict['KIDS_SHEET_NAME']
+    USERS_SHEET_NAME = settings_dict['USERS_SHEET_NAME']
+    KID_USERS_SHEET_NAME = settings_dict['KID_USERS_SHEET_NAME']
+    TEACHER_SHEET_NAME = settings_dict['TEACHER_SHEET_NAME']
+    REVIEWS_SHEET_NAME = settings_dict['REVIEWS_SHEET_NAME']
+
+    print(KIDS_SHEET_NAME, USERS_SHEET_NAME, KID_USERS_SHEET_NAME, TEACHER_SHEET_NAME, REVIEWS_SHEET_NAME)
+    get_admin_list()
+    print(admin_list_id)
+
+
+if __name__ == '__main__':
+    update_data()
