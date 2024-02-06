@@ -5,6 +5,7 @@ import asyncio
 import logging
 import os
 
+from core.google_sheets import update_data
 from core.handlers.basic import get_started
 from core.settings import settings
 from aiogram.filters import ContentTypesFilter, Command
@@ -32,6 +33,9 @@ async def start():
     dp.message.register(get_started, Command(commands=['start', 'run']))
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
+
+    update_data()
+    print(settings)
 
     try:
         await dp.start_polling(bot)

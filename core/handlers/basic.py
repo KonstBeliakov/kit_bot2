@@ -11,4 +11,4 @@ async def get_started(message: Message, bot: Bot):
                                reply_markup=admin_keyboard)
     else:
         await bot.send_message(message.from_user.id, f'Привет, {message.from_user.first_name}',
-                                reply_markup=user_keyboard(message.from_user.id))
+                               reply_markup=user_keyboard(message.from_user.id))
