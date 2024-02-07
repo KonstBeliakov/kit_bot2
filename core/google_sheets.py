@@ -1,6 +1,9 @@
 from googleapiclient.discovery import build
 from core.settings import settings
 
+from time import perf_counter
+import threading
+
 admin_list_id = []
 
 # this dictionary should map username to list of lessons
@@ -48,8 +51,8 @@ def get_nicks():
     nicks = {line[name_id]: line[nick_id] for line in kid_users_sheet[1:]}
 
 
-def get_students():
-    global students
+def get_classes():
+    global class_dict, students_set
 
     kids_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id,
                                  f'{KIDS_SHEET_NAME}!A1:BB1000')
@@ -64,8 +67,9 @@ def get_students():
                 class_dict[kids_sheet[0][i]].append(line[i])
                 students_set.add(line[i])
 
-    print(f'class_dict: {class_dict}')
 
+def get_subject():
+    global subject_dict
     teacher_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id,
                                     f'{TEACHER_SHEET_NAME}!A1:H1000')
 
@@ -78,16 +82,15 @@ def get_students():
     for line in teacher_sheet[1:]:
         subject_dict[line[class_id]].append(line[subject_id])
 
-    print(f'subject_dict: {subject_dict}')
-    print(f'students_set: {students_set}')
+
+def generate_students_dict():
+    global students
 
     students = {student: [] for student in students_set}
     for class_name in class_dict:
         for student_name in class_dict[class_name]:
             for subject in subject_dict[class_name]:
                 students[nicks.get(student_name, student_name)].append(subject)
-
-    print(f'students: {students}')
 
 
 def update_data():
@@ -97,20 +100,22 @@ def update_data():
     settings_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id, 'settings!A1:H1000')
     settings_dict = {i[0]: i[1] for i in settings_sheet}
 
-    print(settings_dict)
-
     KIDS_SHEET_NAME = settings_dict['KIDS_SHEET_NAME']
     USERS_SHEET_NAME = settings_dict['USERS_SHEET_NAME']
     KID_USERS_SHEET_NAME = settings_dict['KID_USERS_SHEET_NAME']
     TEACHER_SHEET_NAME = settings_dict['TEACHER_SHEET_NAME']
     REVIEWS_SHEET_NAME = settings_dict['REVIEWS_SHEET_NAME']
 
-    print(KIDS_SHEET_NAME, USERS_SHEET_NAME, KID_USERS_SHEET_NAME, TEACHER_SHEET_NAME, REVIEWS_SHEET_NAME)
-    get_admin_list()
-    get_nicks()
-    get_students()
-    print(admin_list_id)
+    t = [threading.Thread(target=get_admin_list), threading.Thread(target=get_nicks),
+         threading.Thread(target=get_classes), threading.Thread(target=get_subject)]
+
+    for i in t:
+        i.start()
+    for i in t:
+        i.join()
+
+    generate_students_dict()
 
 
 if __name__ == '__main__':
-    update_data()
+        update_data()
