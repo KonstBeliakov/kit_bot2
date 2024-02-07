@@ -106,6 +106,7 @@ def update_data():
     TEACHER_SHEET_NAME = settings_dict['TEACHER_SHEET_NAME']
     REVIEWS_SHEET_NAME = settings_dict['REVIEWS_SHEET_NAME']
 
+    '''
     t = [threading.Thread(target=get_admin_list), threading.Thread(target=get_nicks),
          threading.Thread(target=get_classes), threading.Thread(target=get_subject)]
 
@@ -114,8 +115,16 @@ def update_data():
     for i in t:
         i.join()
 
+    '''
+    get_admin_list()
+    get_nicks()
+    get_classes()
+    get_subject()
+
+    print('aaaa', subject_dict, class_dict, sep='\n')
+
     generate_students_dict()
 
 
-if __name__ == '__main__':
-    update_data()
+update_data()
+print(f'admin_list_id: {admin_list_id}')

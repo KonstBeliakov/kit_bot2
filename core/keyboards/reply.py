@@ -14,13 +14,13 @@ admin_keyboard = ReplyKeyboardMarkup(keyboard=[
 )
 
 
-def user_keyboard(user_id: int):
+def user_keyboard(username: str):
     t_keyboard = []
-    if students.get(user_id, False):
-        for i in range(len(students[user_id])):
-            t_keyboard.append(KeyboardButton(text=students[user_id][i]), )
+    if students.get(username, False):
+        for i in range(len(students[username])):
+            t_keyboard.append(KeyboardButton(text=students[username][i]))
     else:
-        t_keyboard = ['Не получилось найти уроки к которым вы можете оставить отзыв :(']
+        t_keyboard = [KeyboardButton(text='Уроки не найдены')]
 
     return ReplyKeyboardMarkup(keyboard=[t_keyboard], resize_keyboard=True,
                                one_time_keyboard=True,

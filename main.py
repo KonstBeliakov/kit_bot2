@@ -5,13 +5,15 @@ import asyncio
 import logging
 import os
 
-from core.google_sheets import update_data
+from core.google_sheets import update_data, admin_list_id
+from core.handlers import basic
 from core.handlers.basic import get_started
 from core.settings import settings
 from aiogram.filters import ContentTypesFilter, Command
 from aiogram import F
 
 from core.utils.commands import set_commands
+from core.utils.botstates import BotStates
 
 admin_id = []
 
@@ -37,7 +39,7 @@ async def start():
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
 
-    update_data()
+    dp.message.register(basic.admin_start_keyboard, BotStates.ADMIN_START)
 
     try:
         await dp.start_polling(bot)
