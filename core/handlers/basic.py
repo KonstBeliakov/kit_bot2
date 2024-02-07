@@ -39,4 +39,11 @@ async def admin_start_keyboard(message: Message, bot: Bot, state: FSMContext):
 async def select_lesson(message: Message, bot: Bot, state: FSMContext):
     await bot.send_message(message.from_user.id, f'Теперь выбери тип отзыва для урока {message.text}',
                            reply_markup=review_type_select_keyboard)
-    await state.set_state(BotStates.DEFAULT)
+    await state.set_state(BotStates.REVIEW_TYPE_SELECTION)
+
+
+async def select_review_type(message: Message, bot: Bot, state: FSMContext):
+    await bot.send_message(message.from_user.id,
+                           f'Теперь можешь написать {"анонимный " if message.text == "Анонимный отзыв" else ""}отзыв '
+                           f'к уроку')
+    await state.set_state(BotStates.WAITING_REVIEW)
