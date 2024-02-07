@@ -86,11 +86,12 @@ def get_subject():
 def generate_students_dict():
     global students, subject_dict, class_dict
 
-    students = {student: [] for student in students_set}
+    students = {nicks.get(student_name, student_name): [] for student_name in students_set}
     for class_name in class_dict:
         for student_name in class_dict[class_name]:
             for subject in subject_dict[class_name]:
-                students[nicks.get(student_name, student_name)].append(subject)
+                if nicks.get(student_name, student_name) in students:
+                    students[nicks.get(student_name, student_name)].append(subject)
 
 
 def update_data():
@@ -121,10 +122,7 @@ def update_data():
     get_classes()
     get_subject()
 
-    print('aaaa', subject_dict, class_dict, sep='\n')
-
     generate_students_dict()
 
 
 update_data()
-print(f'admin_list_id: {admin_list_id}')

@@ -1,5 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, KeyboardButtonPollType
-from core.google_sheets import students
+from core.google_sheets import students, nicks
 
 admin_keyboard = ReplyKeyboardMarkup(keyboard=[
     [
@@ -20,6 +20,8 @@ def user_keyboard(username: str):
         for i in range(len(students[username])):
             t_keyboard.append(KeyboardButton(text=students[username][i]))
     else:
+        print(students.get(username, True), students.items(), sep='\n')
+        print(nicks, nicks.get(username, True))
         t_keyboard = [KeyboardButton(text='Уроки не найдены')]
 
     return ReplyKeyboardMarkup(keyboard=[t_keyboard], resize_keyboard=True,
