@@ -10,8 +10,18 @@ admin_keyboard = ReplyKeyboardMarkup(keyboard=[
             text='Обновить данные бота'
         ),
     ],
-], resize_keyboard=True, one_time_keyboard=True, input_field_placeholder='Выбери одну из кнопок', selective=True
-)
+], resize_keyboard=True, one_time_keyboard=True, input_field_placeholder='Выбери одну из кнопок', selective=True)
+
+review_type_select_keyboard = ReplyKeyboardMarkup(keyboard=[
+    [
+        KeyboardButton(
+            text='Обычный отзыв'
+        ),
+        KeyboardButton(
+            text='Анонимный отзыв'
+        ),
+    ]
+], resize_keyboard=True, one_time_keyboard=True, input_field_placeholder='Выбери одну из кнопок', selective=True)
 
 
 def user_keyboard(username: str):

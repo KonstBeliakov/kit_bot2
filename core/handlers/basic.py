@@ -2,7 +2,7 @@ from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from core.keyboards.reply import admin_keyboard, user_keyboard
+from core.keyboards.reply import admin_keyboard, user_keyboard, review_type_select_keyboard
 from core.google_sheets import admin_list_id, nicks
 from core.utils.botstates import BotStates
 from core.google_sheets import update_data
@@ -34,3 +34,9 @@ async def admin_start_keyboard(message: Message, bot: Bot, state: FSMContext):
             else:
                 await bot.send_message(message.from_user.id, 'Данные успешно обновлены')
             await state.set_state(BotStates.DEFAULT)
+
+
+async def select_lesson(message: Message, bot: Bot, state: FSMContext):
+    await bot.send_message(message.from_user.id, f'Теперь выбери тип отзыва для урока {message.text}',
+                           reply_markup=review_type_select_keyboard)
+    await state.set_state(BotStates.DEFAULT)

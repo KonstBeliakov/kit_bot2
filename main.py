@@ -40,6 +40,7 @@ async def start():
     dp.shutdown.register(stop_bot)
 
     dp.message.register(basic.admin_start_keyboard, BotStates.ADMIN_START)
+    dp.message.register(basic.select_lesson, BotStates.LESSON_SELECTION)
 
     try:
         await dp.start_polling(bot)
