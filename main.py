@@ -11,10 +11,13 @@ from core.settings import settings
 from aiogram.filters import ContentTypesFilter, Command
 from aiogram import F
 
+from core.utils.commands import set_commands
+
 admin_id = []
 
 
 async def start_bot(bot: Bot):
+    await set_commands(bot)
     await bot.send_message(settings.bots.admin_id, text='Бот запущен')
 
 

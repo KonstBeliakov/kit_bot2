@@ -7,7 +7,7 @@ import threading
 admin_list_id = []
 
 # this dictionary should map username to list of lessons
-students = {5113054388: ['Математика', 'Информатика']}
+students = {}
 nicks = {}
 
 
@@ -84,7 +84,7 @@ def get_subject():
 
 
 def generate_students_dict():
-    global students
+    global students, subject_dict, class_dict
 
     students = {student: [] for student in students_set}
     for class_name in class_dict:
@@ -118,4 +118,4 @@ def update_data():
 
 
 if __name__ == '__main__':
-        update_data()
+    update_data()
