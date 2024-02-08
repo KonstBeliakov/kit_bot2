@@ -1,6 +1,10 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
+selected_lesson = {}
+selected_review_type = {}
+
+
 class BotStates(StatesGroup):
     ADMIN_START = State()
     LESSON_SELECTION = State()

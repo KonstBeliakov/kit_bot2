@@ -4,8 +4,8 @@ from aiogram.types import Message
 
 from core.keyboards.reply import admin_keyboard, user_keyboard, review_type_select_keyboard, try_again_keyboard
 from core.google_sheets import admin_list_id, nicks
-from core.utils.botstates import BotStates
-from core.google_sheets import update_data
+from core.utils.botstates import BotStates, selected_lesson, selected_review_type
+from core.google_sheets import update_data, write_review
 
 
 async def update_bot(message: Message, bot: Bot, state: FSMContext):
@@ -43,16 +43,33 @@ async def admin_start_keyboard(message: Message, bot: Bot, state: FSMContext):
 
 
 async def select_lesson(message: Message, bot: Bot, state: FSMContext):
+    global selected_lesson
+    selected_lesson[message.from_user.username] = message.text
     await bot.send_message(message.from_user.id, f'Теперь выбери тип отзыва для урока {message.text}',
                            reply_markup=review_type_select_keyboard)
+
     await state.set_state(BotStates.REVIEW_TYPE_SELECTION)
 
 
 async def select_review_type(message: Message, bot: Bot, state: FSMContext):
+    global selected_review_type
+    selected_review_type[message.from_user.username] = message.text
     await bot.send_message(message.from_user.id,
                            f'Теперь можешь написать {"анонимный " if message.text == "Анонимный отзыв" else ""}отзыв '
-                           f'к уроку')
+                           f'к уроку {selected_lesson[message.from_user.username]}')
     await state.set_state(BotStates.WAITING_REVIEW)
+
+
+async def wait_review(message: Message, bot: Bot, state: FSMContext):
+    await bot.send_message(message.from_user.id, f'Сохраняем отзыв...')
+    try:
+        write_review(message.from_user.username, selected_lesson[message.from_user.username],
+                     selected_review_type == 'Анонимный отзыв', message.text)
+    except Exception as err:
+        await bot.send_message(message.from_user.id, f'При сохранении отзыва произошла ошибка: {err}')
+    else:
+        await bot.send_message(message.from_user.id, f'Отзыв сохранен успешно')
+    await state.set_state(BotStates.DEFAULT)
 
 
 async def try_again(message: Message, bot: Bot, state: FSMContext):
