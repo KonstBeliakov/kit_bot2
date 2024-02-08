@@ -23,6 +23,17 @@ review_type_select_keyboard = ReplyKeyboardMarkup(keyboard=[
     ]
 ], resize_keyboard=True, one_time_keyboard=True, input_field_placeholder='Выбери одну из кнопок', selective=True)
 
+try_again_keyboard = ReplyKeyboardMarkup(keyboard=[
+    [
+        KeyboardButton(
+            text='Попробовать еще раз'
+        ),
+        KeyboardButton(
+            text='Назад'
+        ),
+    ]
+], resize_keyboard=True, one_time_keyboard=True, input_field_placeholder='Выбери одну из кнопок', selective=True)
+
 
 def user_keyboard(username: str):
     t_keyboard = []

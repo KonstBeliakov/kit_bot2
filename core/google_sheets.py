@@ -3,6 +3,7 @@ from core.settings import settings
 
 from time import perf_counter
 import threading
+import random
 
 admin_list_id = []
 
@@ -95,6 +96,8 @@ def generate_students_dict():
 
 
 def update_data():
+    #if random.randrange(2):
+    #    raise Exception('симулируем неудачный запрос к гугл таблицам')
     global admin_list_id
     global KIDS_SHEET_NAME, USERS_SHEET_NAME, KID_USERS_SHEET_NAME, TEACHER_SHEET_NAME, REVIEWS_SHEET_NAME
 

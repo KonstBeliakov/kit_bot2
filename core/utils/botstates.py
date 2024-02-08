@@ -7,3 +7,4 @@ class BotStates(StatesGroup):
     DEFAULT = State()
     REVIEW_TYPE_SELECTION = State()
     WAITING_REVIEW = State()
+    TRY_AGAIN = State()

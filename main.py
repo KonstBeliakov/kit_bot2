@@ -42,6 +42,7 @@ async def start():
     dp.message.register(basic.admin_start_keyboard, BotStates.ADMIN_START)
     dp.message.register(basic.select_lesson, BotStates.LESSON_SELECTION)
     dp.message.register(basic.select_review_type, BotStates.REVIEW_TYPE_SELECTION)
+    dp.message.register(basic.try_again, BotStates.TRY_AGAIN)
 
     try:
         await dp.start_polling(bot)

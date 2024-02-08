@@ -2,19 +2,32 @@ from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from core.keyboards.reply import admin_keyboard, user_keyboard, review_type_select_keyboard
+from core.keyboards.reply import admin_keyboard, user_keyboard, review_type_select_keyboard, try_again_keyboard
 from core.google_sheets import admin_list_id, nicks
 from core.utils.botstates import BotStates
 from core.google_sheets import update_data
 
 
+async def update_bot(message: Message, bot: Bot, state: FSMContext):
+    await bot.send_message(message.from_user.id, 'Данные будут обновлены в течении нескольких секунд...')
+    try:
+        update_data()
+    except Exception as err:
+        await bot.send_message(message.from_user.id, f'При обновлении данных произошла ошибка: {err}',
+                               reply_markup=try_again_keyboard)
+        await state.set_state(BotStates.TRY_AGAIN)
+    else:
+        await bot.send_message(message.from_user.id, 'Данные успешно обновлены')
+        await state.set_state(BotStates.DEFAULT)
+
+
 async def get_started(message: Message, bot: Bot, state: FSMContext):
     if message.from_user.username in admin_list_id:
-        await bot.send_message(message.from_user.id, f'Ты в списке администраторов!',
-                               reply_markup=admin_keyboard)
+        await bot.send_message(message.from_user.id, f'Ты в списке администраторов! Тебе доступна возможность '
+                                                     f'обновления данных бота', reply_markup=admin_keyboard)
         await state.set_state(BotStates.ADMIN_START)
     else:
-        await bot.send_message(message.from_user.id, f'Привет, {message.from_user.first_name}',
+        await bot.send_message(message.from_user.id, f'Выбери урок к которому хочешь оставить отзыв:',
                                reply_markup=user_keyboard(message.from_user.username))
         await state.set_state(BotStates.LESSON_SELECTION)
 
@@ -22,18 +35,11 @@ async def get_started(message: Message, bot: Bot, state: FSMContext):
 async def admin_start_keyboard(message: Message, bot: Bot, state: FSMContext):
     match message.text:
         case 'Оставить отзыв':
-            await bot.send_message(message.from_user.id, f'Ты можешь оставить отзыв к одному из этих уроков:',
+            await bot.send_message(message.from_user.id, f'Выбери урок к которому хочешь оставить отзыв:',
                                    reply_markup=user_keyboard(message.from_user.username))
             await state.set_state(BotStates.LESSON_SELECTION)
         case 'Обновить данные бота':
-            await bot.send_message(message.from_user.id, 'Данные будут обновлены в течении нескольких секунд...')
-            try:
-                update_data()
-            except:
-                await bot.send_message(message.from_user.id, 'При обновлении данных произошла ошибка')
-            else:
-                await bot.send_message(message.from_user.id, 'Данные успешно обновлены')
-            await state.set_state(BotStates.DEFAULT)
+            await update_bot(message, bot, state)
 
 
 async def select_lesson(message: Message, bot: Bot, state: FSMContext):
@@ -47,3 +53,12 @@ async def select_review_type(message: Message, bot: Bot, state: FSMContext):
                            f'Теперь можешь написать {"анонимный " if message.text == "Анонимный отзыв" else ""}отзыв '
                            f'к уроку')
     await state.set_state(BotStates.WAITING_REVIEW)
+
+
+async def try_again(message: Message, bot: Bot, state: FSMContext):
+    if message.text == 'Попробовать еще раз':
+        await update_bot(message, bot, state)
+    else:
+        await bot.send_message(message.from_user.id, f'Ты в списке администраторов! Тебе доступна возможность '
+                                                     f'обновления данных бота', reply_markup=admin_keyboard)
+        await state.set_state(BotStates.ADMIN_START)
