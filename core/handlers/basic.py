@@ -27,17 +27,24 @@ async def get_started(message: Message, bot: Bot, state: FSMContext):
                                                      f'обновления данных бота', reply_markup=admin_keyboard)
         await state.set_state(BotStates.ADMIN_START)
     else:
+        await keyboard_sellect_lesson(message, bot, state)
+
+
+async def keyboard_sellect_lesson(message: Message, bot: Bot, state: FSMContext):
+    if user_keyboard(message.from_user.username):
         await bot.send_message(message.from_user.id, f'Выбери урок к которому хочешь оставить отзыв:',
                                reply_markup=user_keyboard(message.from_user.username))
         await state.set_state(BotStates.LESSON_SELECTION)
+    else:
+        await bot.send_message(message.from_user.id, f'Не смогли найти тебя в списке учеников :(. Попроси администратора добавить тебя в базу данных и обновить данные бота.',
+                               reply_markup=user_keyboard(message.from_user.username))
+        await state.set_state(BotStates.DEFAULT)
 
 
 async def admin_start_keyboard(message: Message, bot: Bot, state: FSMContext):
     match message.text:
         case 'Оставить отзыв':
-            await bot.send_message(message.from_user.id, f'Выбери урок к которому хочешь оставить отзыв:',
-                                   reply_markup=user_keyboard(message.from_user.username))
-            await state.set_state(BotStates.LESSON_SELECTION)
+            await keyboard_sellect_lesson(message, bot, state)
         case 'Обновить данные бота':
             await update_bot(message, bot, state)
 
