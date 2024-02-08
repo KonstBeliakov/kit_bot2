@@ -1,6 +1,10 @@
+import os
+
 from googleapiclient.discovery import build
 from core.settings import settings
+from google.oauth2 import service_account
 
+from datetime import datetime
 from time import perf_counter
 import threading
 import random
@@ -9,7 +13,17 @@ admin_list_id = []
 
 # this dictionary should map username to list of lessons
 students = {}
+# dictionary matching names to nicknames
 nicks = {}
+# dictionary matching nicknames to names
+names = {}
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'credentials.json')
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+service = build('sheets', 'v4', credentials=credentials)
+write_sheet = service.spreadsheets()
 
 
 def read_from_table(api_key: str, spreadsheetId: str, range: str):
@@ -27,6 +41,14 @@ def write_to_table(write_sheet, spreadsheetId: str, range: str, values: list):
     ).execute()
 
 
+def write_review(username: str, lesson: str, anonimous: bool, review_text: str):
+    write_to_table(write_sheet=write_sheet, spreadsheetId=settings.spreadsheet_id,
+                   range=f'{REVIEWS_SHEET_NAME}!A14:D14',
+                   values=[
+                       [str(datetime.now()), lesson, names.get(username, username) if not anonimous else '', review_text]
+                   ])
+
+
 def get_admin_list():
     global admin_list_id
     users_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id,
@@ -42,7 +64,7 @@ def get_admin_list():
 
 
 def get_nicks():
-    global nicks
+    global nicks, names
     kid_users_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id,
                                       f'{KID_USERS_SHEET_NAME}!A1:H1000')
 
@@ -50,6 +72,7 @@ def get_nicks():
     name_id = kid_users_sheet[0].index('name')
 
     nicks = {line[name_id]: line[nick_id] for line in kid_users_sheet[1:]}
+    names = {line[nick_id]: line[name_id] for line in kid_users_sheet[1:]}
 
 
 def get_classes():
@@ -96,7 +119,7 @@ def generate_students_dict():
 
 
 def update_data():
-    #if random.randrange(2):
+    # if random.randrange(2):
     #    raise Exception('симулируем неудачный запрос к гугл таблицам')
     global admin_list_id
     global KIDS_SHEET_NAME, USERS_SHEET_NAME, KID_USERS_SHEET_NAME, TEACHER_SHEET_NAME, REVIEWS_SHEET_NAME
@@ -129,3 +152,6 @@ def update_data():
 
 
 update_data()
+
+if __name__ == '__main__':
+    write_review('KonstBeliakov', 'Математика', False, 'Текст отзыва')
