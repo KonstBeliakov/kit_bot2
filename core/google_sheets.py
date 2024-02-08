@@ -17,6 +17,7 @@ students = {}
 nicks = {}
 # dictionary matching nicknames to names
 names = {}
+reviews_number = None
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'credentials.json')
@@ -42,8 +43,10 @@ def write_to_table(write_sheet, spreadsheetId: str, range: str, values: list):
 
 
 def write_review(username: str, lesson: str, anonimous: bool, review_text: str):
+    global reviews_number
+    reviews_number += 1
     write_to_table(write_sheet=write_sheet, spreadsheetId=settings.spreadsheet_id,
-                   range=f'{REVIEWS_SHEET_NAME}!A14:D14',
+                   range=f'{REVIEWS_SHEET_NAME}!A{reviews_number}:D{reviews_number}',
                    values=[
                        [str(datetime.now()), lesson, names.get(username, username) if not anonimous else '', review_text]
                    ])
@@ -73,6 +76,13 @@ def get_nicks():
 
     nicks = {line[name_id]: line[nick_id] for line in kid_users_sheet[1:]}
     names = {line[nick_id]: line[name_id] for line in kid_users_sheet[1:]}
+
+
+def get_review_number():
+    global reviews_number
+
+    review_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id, f'{REVIEWS_SHEET_NAME}!A1:BB1000')
+    reviews_number = len(review_sheet)
 
 
 def get_classes():
@@ -147,6 +157,9 @@ def update_data():
     get_nicks()
     get_classes()
     get_subject()
+    get_review_number()
+
+    print(reviews_number)
 
     generate_students_dict()
 
@@ -154,4 +167,4 @@ def update_data():
 update_data()
 
 if __name__ == '__main__':
-    write_review('KonstBeliakov', 'Математика', False, 'Текст отзыва')
+    write_review('KonstBeliakov', 'Математика', False, 'Текст отзыва 2')
