@@ -36,7 +36,9 @@ async def keyboard_sellect_lesson(message: Message, bot: Bot, state: FSMContext)
                                reply_markup=user_keyboard(message.from_user.username))
         await state.set_state(BotStates.LESSON_SELECTION)
     else:
-        await bot.send_message(message.from_user.id, f'Не смогли найти тебя в списке учеников :(. Попроси администратора добавить тебя в базу данных и обновить данные бота.',
+        await bot.send_message(message.from_user.id,
+                               f'Не смогли найти тебя в списке учеников :( Попроси администратора добавить тебя'
+                               f' в базу данных и обновить данные бота.',
                                reply_markup=user_keyboard(message.from_user.username))
         await state.set_state(BotStates.DEFAULT)
 
