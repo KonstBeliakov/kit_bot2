@@ -1,16 +1,12 @@
 from aiogram import Bot, Dispatcher
-from aiogram.types import Message, ContentType
 
 import asyncio
 import logging
-import os
 
-from core.google_sheets import update_data, admin_list_id
 from core.handlers import basic
 from core.handlers.basic import get_started
 from core.settings import settings
-from aiogram.filters import ContentTypesFilter, Command
-from aiogram import F
+from aiogram.filters import Command
 
 from core.utils.commands import set_commands
 from core.utils.botstates import BotStates

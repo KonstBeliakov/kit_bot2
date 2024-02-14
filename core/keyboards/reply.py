@@ -1,5 +1,5 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, KeyboardButtonPollType
-from core.google_sheets import students, nicks
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from core.google_sheets import students
 
 admin_keyboard = ReplyKeyboardMarkup(keyboard=[
     [

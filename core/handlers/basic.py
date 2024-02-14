@@ -1,10 +1,10 @@
-from aiogram import Bot, Dispatcher
+from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from core.keyboards.reply import admin_keyboard, user_keyboard, review_type_select_keyboard, try_again_keyboard
-from core.google_sheets import admin_list_id, nicks
-from core.utils.botstates import BotStates, selected_lesson, selected_review_type
+from core.google_sheets import admin_list_id
+from core.utils.botstates import BotStates
 from core.google_sheets import update_data, write_review
 
 
