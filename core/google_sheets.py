@@ -5,9 +5,6 @@ from core.settings import settings
 from google.oauth2 import service_account
 
 from datetime import datetime
-from time import perf_counter
-import threading
-import random
 
 admin_list_id = []
 
@@ -17,6 +14,13 @@ students = {}
 nicks = {}
 # dictionary matching nicknames to names
 names = {}
+# a dictionary matching class names with a list of students in it
+class_dict = {}
+students_set = set()
+# dictionary matching classes with a list of lessons in them
+subject_dict = {}
+# dictionary matching students with list of classes
+students_classes_dict = {}
 reviews_number = None
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -45,10 +49,17 @@ def write_to_table(write_sheet, spreadsheetId: str, range: str, values: list):
 def write_review(username: str, lesson: str, anonimous: bool, review_text: str):
     global reviews_number
     reviews_number += 1
+    student_classes = students_classes_dict[names.get(username, username)]
+    student_class = None
+    for cl in student_classes:
+        if lesson in subject_dict[cl]:
+            student_class = cl
+            break
     write_to_table(write_sheet=write_sheet, spreadsheetId=settings.spreadsheet_id,
-                   range=f'{REVIEWS_SHEET_NAME}!A{reviews_number}:D{reviews_number}',
+                   range=f'{REVIEWS_SHEET_NAME}!A{reviews_number}:E{reviews_number}',
                    values=[
-                       [str(datetime.now()), lesson, names.get(username, username) if not anonimous else '', review_text]
+                       [str(datetime.now()), lesson, student_class, names.get(username, username) if not anonimous else '',
+                        review_text]
                    ])
 
 
@@ -81,7 +92,8 @@ def get_nicks():
 def get_review_number():
     global reviews_number
 
-    review_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id, f'{REVIEWS_SHEET_NAME}!A1:BB1000')
+    review_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id,
+                                   f'{REVIEWS_SHEET_NAME}!A1:BB1000')
     reviews_number = len(review_sheet)
 
 
@@ -91,7 +103,6 @@ def get_classes():
     kids_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id,
                                  f'{KIDS_SHEET_NAME}!A1:BB1000')
 
-    # a dictionary matching class names with a list of students in it
     class_dict = {class_name: [] for class_name in kids_sheet[0]}
     students_set = set()
 
@@ -110,7 +121,6 @@ def get_subject():
     subject_id = teacher_sheet[0].index('Предмет')
     class_id = teacher_sheet[0].index('Класс')
 
-    # dictionary matching classes with a list of lessons in them
     subject_dict = {class_name: [] for class_name in class_dict.keys()}
 
     for line in teacher_sheet[1:]:
@@ -126,6 +136,10 @@ def generate_students_dict():
             for subject in subject_dict[class_name]:
                 if nicks.get(student_name, student_name) in students:
                     students[nicks.get(student_name, student_name)].append(subject)
+
+    for cl, st_list in class_dict.items():
+        for st in st_list:
+            students_classes_dict[st] = students_classes_dict.get(st, []) + [cl]
 
 
 def update_data():
@@ -167,4 +181,5 @@ def update_data():
 update_data()
 
 if __name__ == '__main__':
+    #update_data()
     write_review('KonstBeliakov', 'Математика', False, 'Текст отзыва 2')
