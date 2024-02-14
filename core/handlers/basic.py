@@ -72,8 +72,8 @@ async def select_review_type(message: Message, bot: Bot, state: FSMContext):
 async def wait_review(message: Message, bot: Bot, state: FSMContext):
     await bot.send_message(message.from_user.id, f'Сохраняем отзыв...')
     try:
-        write_review(message.from_user.username, selected_lesson[message.from_user.username],
-                     selected_review_type == 'Анонимный отзыв', message.text)
+        write_review(username=message.from_user.username, lesson=selected_lesson[message.from_user.username],
+                     anonimous=selected_review_type[message.from_user.username] == 'Анонимный отзыв', review_text=message.text)
     except Exception as err:
         await bot.send_message(message.from_user.id, f'При сохранении отзыва произошла ошибка: {err}')
     else:
