@@ -1,4 +1,4 @@
-from aiogram import Bot
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
@@ -24,7 +24,7 @@ async def update_bot(message: Message, bot: Bot, state: FSMContext):
 async def get_started(message: Message, bot: Bot, state: FSMContext):
     if message.from_user.username in admin_list_id:
         await bot.send_message(message.from_user.id, f'Ты в списке администраторов! Тебе доступна возможность '
-                                                     f'обновления данных бота', reply_markup=admin_keyboard)
+                                                     f'обновления данных бота и остановки бота', reply_markup=admin_keyboard)
         await state.set_state(BotStates.ADMIN_START)
     else:
         await keyboard_sellect_lesson(message, bot, state)
@@ -49,6 +49,8 @@ async def admin_start_keyboard(message: Message, bot: Bot, state: FSMContext):
             await keyboard_sellect_lesson(message, bot, state)
         case 'Обновить данные бота':
             await update_bot(message, bot, state)
+        case 'Остановить бота':
+            exit()
         case _:
             await bot.send_message(message.from_user.id, f'Не получилось найти команду "{message.text}".'
                                                          f' Пожалуйста выбери одну из доступных комманд',
@@ -100,7 +102,7 @@ async def wait_review(message: Message, bot: Bot, state: FSMContext):
 
 
 async def try_again(message: Message, bot: Bot, state: FSMContext):
-    match (message.text):
+    match message.text:
         case 'Попробовать еще раз':
             await update_bot(message, bot, state)
         case 'Назад':
