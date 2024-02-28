@@ -7,6 +7,9 @@ from core.google_sheets import admin_list_id
 from core.utils.botstates import BotStates
 from core.google_sheets import update_data, write_review
 
+selected_lesson = {}
+selected_review_type = {}
+
 
 async def update_bot(message: Message, bot: Bot, state: FSMContext):
     await bot.send_message(message.from_user.id, 'Данные будут обновлены в течении нескольких секунд...')
@@ -24,7 +27,8 @@ async def update_bot(message: Message, bot: Bot, state: FSMContext):
 async def get_started(message: Message, bot: Bot, state: FSMContext):
     if message.from_user.username in admin_list_id:
         await bot.send_message(message.from_user.id, f'Ты в списке администраторов! Тебе доступна возможность '
-                                                     f'обновления данных бота и остановки бота', reply_markup=admin_keyboard)
+                                                     f'обновления данных бота и остановки бота',
+                               reply_markup=admin_keyboard)
         await state.set_state(BotStates.ADMIN_START)
     else:
         await keyboard_sellect_lesson(message, bot, state)
