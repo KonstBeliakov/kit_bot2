@@ -7,7 +7,6 @@ from core.google_sheets import admin_list_id
 from core.utils.botstates import BotStates
 from core.google_sheets import update_data, write_review
 
-
 selected_lesson = {}
 selected_review_type = {}
 
