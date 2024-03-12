@@ -31,7 +31,8 @@ async def get_started(message: Message, bot: Bot, state: FSMContext):
 async def start_text(message: Message, bot: Bot, state: FSMContext):
     if message.from_user.username in admin_list_id:
         await bot.send_message(message.from_user.id, f'Ты в списке администраторов! Тебе доступна возможность '
-                                                     f'обновления данных бота и остановки бота', reply_markup=admin_keyboard)
+                                                     f'обновления данных бота и остановки бота',
+                               reply_markup=admin_keyboard)
         await state.set_state(BotStates.ADMIN_START)
     else:
         await keyboard_sellect_lesson(message, bot, state)
