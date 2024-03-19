@@ -1,4 +1,5 @@
 import os
+import threading
 
 from googleapiclient.discovery import build
 from core.settings import settings
@@ -114,9 +115,13 @@ def get_classes():
 
 
 def get_subject():
-    global subject_dict
+    global subject_dict, teacher_sheet
     teacher_sheet = read_from_table(settings.google_sheets_api_key, settings.spreadsheet_id,
                                     f'{TEACHER_SHEET_NAME}!A1:H1000')
+
+
+def generate_students_dict():
+    global students, subject_dict, class_dict, teacher_sheet
 
     subject_id = teacher_sheet[0].index('Предмет')
     class_id = teacher_sheet[0].index('Класс')
@@ -125,10 +130,6 @@ def get_subject():
 
     for line in teacher_sheet[1:]:
         subject_dict[line[class_id]].append(line[subject_id])
-
-
-def generate_students_dict():
-    global students, subject_dict, class_dict
 
     students = {nicks.get(student_name, student_name): [] for student_name in students_set}
     for class_name in class_dict:
@@ -157,23 +158,15 @@ def update_data():
     TEACHER_SHEET_NAME = settings_dict['TEACHER_SHEET_NAME']
     REVIEWS_SHEET_NAME = settings_dict['REVIEWS_SHEET_NAME']
 
-    '''
+
     t = [threading.Thread(target=get_admin_list), threading.Thread(target=get_nicks),
-         threading.Thread(target=get_classes), threading.Thread(target=get_subject)]
+         threading.Thread(target=get_classes), threading.Thread(target=get_subject),
+         threading.Thread(target=get_review_number)]
 
     for i in t:
         i.start()
     for i in t:
         i.join()
-
-    '''
-    get_admin_list()
-    get_nicks()
-    get_classes()
-    get_subject()
-    get_review_number()
-
-    print(reviews_number)
 
     generate_students_dict()
 
@@ -181,5 +174,4 @@ def update_data():
 update_data()
 
 if __name__ == '__main__':
-    #update_data()
     write_review('KonstBeliakov', 'Математика', False, 'Текст отзыва 2')
