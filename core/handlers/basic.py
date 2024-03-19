@@ -13,11 +13,7 @@ selected_review_type = {}
 async def update_bot(message: Message, bot: Bot, state: FSMContext):
     await bot.send_message(message.from_user.id, 'Данные будут обновлены в течении нескольких секунд...')
     try:
-        print('количество студентов до обновления', len(google_sheets.students))
         google_sheets.update_data()
-        print('количество студентов после обновления', len(google_sheets.students))  # это число изменяется, значит бот обновляет данные :)
-        print(google_sheets.students)
-        print('Константин Беляков' in google_sheets.students)
     except Exception as err:
         await bot.send_message(message.from_user.id, f'При обновлении данных произошла ошибка: {err}',
                                reply_markup=try_again_keyboard)
@@ -70,7 +66,6 @@ async def admin_start_keyboard(message: Message, bot: Bot, state: FSMContext):
 
 async def select_lesson(message: Message, bot: Bot, state: FSMContext):
     global selected_lesson
-    print([(button[0], type(button[0])) for button in user_keyboard(message.from_user.username).keyboard])
     if message.text in [button[0].text for button in user_keyboard(message.from_user.username).keyboard]:
         selected_lesson[message.from_user.username] = message.text
         await bot.send_message(message.from_user.id, f'Теперь выбери тип отзыва для урока {message.text}',
