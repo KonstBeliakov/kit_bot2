@@ -16,6 +16,8 @@ async def update_bot(message: Message, bot: Bot, state: FSMContext):
         print('количество студентов до обновления', len(google_sheets.students))
         google_sheets.update_data()
         print('количество студентов после обновления', len(google_sheets.students))  # это число изменяется, значит бот обновляет данные :)
+        print(google_sheets.students)
+        print('Константин Беляков' in google_sheets.students)
     except Exception as err:
         await bot.send_message(message.from_user.id, f'При обновлении данных произошла ошибка: {err}',
                                reply_markup=try_again_keyboard)
